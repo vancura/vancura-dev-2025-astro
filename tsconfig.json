@@ -1,0 +1,10 @@
+{
+    "extends": "astro/tsconfigs/strict",
+    "compilerOptions": {
+        "strictNullChecks": true,
+        "checkJs": true,
+        "allowJs": true,
+        "declaration": true,
+        "declarationMap": true
+    }
+}

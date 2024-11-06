@@ -1,0 +1,24 @@
+---
+import { MDX } from '../config/components';
+
+interface Props {
+    showFallback?: boolean;
+}
+
+const { showFallback = true } = Astro.props;
+---
+
+<div class="mdx-content">
+    {
+        showFallback ? (
+            <slot />
+        ) : (
+            <Fragment>
+                <slot />
+                <slot name="fallback">
+                    <p>{MDX.FALLBACK_MESSAGE}</p>
+                </slot>
+            </Fragment>
+        )
+    }
+</div>

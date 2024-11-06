@@ -1,0 +1,10 @@
+# TEAM
+
+    Václav Vančura -- designer, coder, owner -- @vancura
+
+# TECHNOLOGY COLOPHON
+
+    Engine: Astro
+    Fonts: Degular, Swear, Innovator Grotesk
+    Server: Vercel
+    Repo: GitHub

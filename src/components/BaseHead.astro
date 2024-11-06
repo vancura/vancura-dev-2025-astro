@@ -1,0 +1,66 @@
+---
+import strings from '../../strings.mjs';
+import type { SEOMetadata } from '../types';
+import { HEAD } from '../config/components';
+
+export interface Props extends SEOMetadata {
+    title: string;
+    description: string;
+    permalink: string;
+    opengraphImage?: string;
+    opengraphImageAlt?: string;
+}
+
+const { title, description, permalink, opengraphImage, opengraphImageAlt } = Astro.props;
+
+const mode = import.meta.env.MODE;
+const siteDomain = Astro.url.origin;
+
+const opengraphImageURL = opengraphImage === '' ? `${siteDomain}/opengraph.png` : `${siteDomain}/opengraph/${opengraphImage}`;
+const opengraphImageAltSafe = opengraphImageAlt === '' ? title : opengraphImageAlt;
+
+let canonical = new URL(permalink).toString();
+canonical = canonical.endsWith('/') ? canonical.slice(0, -1) : canonical;
+---
+
+<meta http-equiv="Content-Security-Policy" content="default-src 'unsafe-eval' 'unsafe-inline' data:; font-src 'none'; img-src data:;"></meta>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="canonical" href={canonical} />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="alternate" type="application/rss+xml" title="Václav Vančura Design" href="/design.xml" />
+
+<title>{title}</title>
+
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+<meta name="generator" content={Astro.generator} />
+<meta name="robots" content="index, follow" />
+<meta name="author" content={HEAD.META.AUTHOR} />
+<meta name="referrer" content={HEAD.META.REFERRER} />
+<meta name="language" content={HEAD.META.LANGUAGE} />
+
+<link rel="icon" media="(prefers-color-scheme: light)">
+<link rel="icon" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="https://framerusercontent.com/images/qFxRfuJzrPOMDqw1WhkVl2g.png">
+
+<meta property="og:type" content="website" />
+<meta property="og:url" content={permalink} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:site_name" content={strings.title} />
+<meta property="og:image" content={opengraphImageURL} />
+<meta property="og:image:alt" content={opengraphImageAltSafe} />
+<meta property="og:author" content={HEAD.META.AUTHOR} />
+
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={permalink} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={opengraphImageURL} />
+<meta property="twitter:image:alt" content={opengraphImageAltSafe} />
+
+<meta property="article:author" content={HEAD.META.AUTHOR} />
+
+{mode === 'production' && <script defer data-domain="vancura.design" data-category="analytics" src="https://plausible.io/js/script.js" />}

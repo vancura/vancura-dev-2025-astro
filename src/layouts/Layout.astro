@@ -1,0 +1,27 @@
+---
+import { Head } from 'astro-capo';
+import BaseHead from '../components/BaseHead.astro';
+import type { SEOMetadata } from '../types';
+
+import '../styles/mdx-content.css';
+import '../styles/tailwind.css';
+import '../styles/typography.css';
+
+type Props = SEOMetadata;
+
+const { title, description, permalink } = Astro.props;
+---
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <Head>
+        <BaseHead title={title} description={description} permalink={permalink} />
+    </Head>
+
+    <body class="flex min-h-screen flex-col bg-background pb-24 dark:bg-background-dark">
+        <main class="mx-8">
+            <slot />
+        </main>
+    </body>
+</html>
