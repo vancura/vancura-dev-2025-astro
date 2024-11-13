@@ -23,7 +23,18 @@ let canonical = new URL(permalink).toString();
 canonical = canonical.endsWith('/') ? canonical.slice(0, -1) : canonical;
 ---
 
-<meta http-equiv="Content-Security-Policy" content="default-src 'unsafe-eval' 'unsafe-inline' data:; font-src 'none'; img-src data:;"></meta>
+<meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://plausible.io;
+    style-src 'self' 'unsafe-inline';
+    img-src 'self';
+    font-src 'self';
+    connect-src 'self' https://plausible.io;
+    frame-ancestors 'none';
+    base-uri 'self';
+    form-action 'self';
+" />
+
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
