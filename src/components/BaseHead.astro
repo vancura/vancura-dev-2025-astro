@@ -19,8 +19,11 @@ const siteDomain = Astro.url.origin;
 const opengraphImageURL = opengraphImage === '' ? `${siteDomain}/opengraph.png` : `${siteDomain}/opengraph/${opengraphImage}`;
 const opengraphImageAltSafe = opengraphImageAlt === '' ? title : opengraphImageAlt;
 
-let canonical = new URL(permalink).toString();
-canonical = canonical.endsWith('/') ? canonical.slice(0, -1) : canonical;
+let canonical = Astro.url.toString();
+
+if (canonical.endsWith('/')) {
+    canonical = canonical.slice(0, -1);
+}
 ---
 
 <meta http-equiv="Content-Security-Policy" content="
