@@ -16,17 +16,17 @@ const { title, description, permalink, opengraphImage, opengraphImageAlt } = Ast
 const mode = import.meta.env.MODE;
 const siteDomain = Astro.url.origin;
 
-const opengraphImageURL = opengraphImage === '' ? `${siteDomain}/opengraph.png` : `${siteDomain}/opengraph/${opengraphImage}`;
+const opengraphImageURL =
+    opengraphImage === '' ? `${siteDomain}/opengraph.png` : `${siteDomain}/opengraph/${opengraphImage}`;
 const opengraphImageAltSafe = opengraphImageAlt === '' ? title : opengraphImageAlt;
 
-let canonical = Astro.url.toString();
-
-if (canonical.endsWith('/')) {
-    canonical = canonical.slice(0, -1);
-}
+let canonical = new URL(permalink).toString();
+canonical = canonical.endsWith('/') ? canonical.slice(0, -1) : canonical;
 ---
 
-<meta http-equiv="Content-Security-Policy" content="
+<meta
+    http-equiv="Content-Security-Policy"
+    content="
     default-src 'self';
     script-src 'self' https://plausible.io;
     style-src 'self' 'unsafe-inline';
@@ -36,7 +36,13 @@ if (canonical.endsWith('/')) {
     frame-ancestors 'none';
     base-uri 'self';
     form-action 'self';
-" />
+"
+/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff" />
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
+
+<link rel="preconnect" href="https://plausible.io" />
+<link rel="dns-prefetch" href="https://plausible.io" />
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -54,10 +60,6 @@ if (canonical.endsWith('/')) {
 <meta name="author" content={HEAD.META.AUTHOR} />
 <meta name="referrer" content={HEAD.META.REFERRER} />
 <meta name="language" content={HEAD.META.LANGUAGE} />
-
-<link rel="icon" media="(prefers-color-scheme: light)">
-<link rel="icon" media="(prefers-color-scheme: dark)">
-<link rel="apple-touch-icon" href="https://framerusercontent.com/images/qFxRfuJzrPOMDqw1WhkVl2g.png">
 
 <meta property="og:type" content="website" />
 <meta property="og:url" content={permalink} />
@@ -77,4 +79,29 @@ if (canonical.endsWith('/')) {
 
 <meta property="article:author" content={HEAD.META.AUTHOR} />
 
-{mode === 'production' && <script defer data-domain="vancura.design" data-category="analytics" src="https://plausible.io/js/script.js" />}
+<link rel="manifest" href="/manifest.json" />
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content={strings.title} />
+
+<script
+    type="application/ld+json"
+    set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: strings.title,
+        description: description,
+        url: siteDomain,
+        author: {
+            '@type': 'Person',
+            name: HEAD.META.AUTHOR
+        }
+    })}
+/>
+
+{
+    mode === 'production' && (
+        <script defer data-domain="vancura.design" data-category="analytics" src="https://plausible.io/js/script.js" />
+    )
+}

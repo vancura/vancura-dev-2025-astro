@@ -1,5 +1,9 @@
+const { addDynamicIconSelectors } = require('@iconify/tailwind');
+
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+    content: ['./src/**/*.{astro,html,js,jsx,md,mdx,ts}'],
+    plugins: [addDynamicIconSelectors()],
     theme: {
         fontFamily: {
             heading: ['Walsheim Regular', 'sans-serif'],
@@ -7,7 +11,7 @@ module.exports = {
         },
 
         colors: {
-            debug: '#f0f',
+            debug: 'rgba(255, 0, 255, 0.33)',
             transparent: 'transparent',
 
             primary: {
@@ -23,27 +27,30 @@ module.exports = {
             },
 
             background: {
-                DEFAULT: 'rgba(245, 245, 245, 1)',
-                dark: 'rgba(34, 34, 34, 1)',
-                navbar: 'rgba(245, 245, 245, 0.9)',
-                'navbar-dark': 'rgba(34, 34, 34, 0.9)',
-                toc: 'rgba(248, 248, 248, 1)',
-                'toc-dark': 'rgba(17, 17, 17, 1)',
+                DEFAULT: 'rgb(245, 245, 245)',
+                dark: 'rgb(34, 34, 34)',
+                toc: 'rgb(248, 248, 248)',
+                'toc-dark': 'rgb(17, 17, 17)',
                 'toc-filter': 'white',
-                'toc-filter-dark': 'rgba(255, 255, 255, 0.1)',
+                'toc-filter-dark': '#333',
                 'toc-active': 'white',
                 'toc-active-dark': 'rgba(255, 255, 255, 0.1)',
                 'toc-toolbar': 'rgba(248, 248, 248, 0.9)',
                 'toc-toolbar-dark': 'rgba(17, 17, 17, 0.9)',
+                'toc-toolbar-wide': 'rgba(245, 245, 245, 0.9)',
+                'toc-toolbar-wide-dark': 'rgba(34, 34, 34, 0.9)',
                 illustration: '#f3c3de',
-                'illustration-dark': '#684358'
+                'illustration-dark': '#684358',
+                'hero-mobile': 'rgba(245, 245, 245, 0.66)',
+                'banner': 'white',
+                'banner-dark': '#171717'
             },
 
             text: {
                 DEFAULT: '#333333',
                 dark: '#F5F5F5',
-                muted: 'rgba(0, 0, 0, 0.66)',
-                'muted-dark': 'rgba(255, 255, 255, 0.66)',
+                muted: 'rgba(0, 0, 0, 0.5)',
+                'muted-dark': 'rgba(255, 255, 255, 0.5)',
                 toc: '#333',
                 'toc-dark': '#fafafa',
                 'toc-active': '#2833FF',
@@ -54,7 +61,7 @@ module.exports = {
                 DEFAULT: '#222',
                 dark: '#f5f5f5',
                 text: 'white',
-                'text-dark': 'white'
+                'text-dark': 'black'
             },
 
             ui: {
@@ -72,8 +79,15 @@ module.exports = {
             code: {
                 stroke: 'rgba(0, 0, 0, 0.1)',
                 'stroke-dark': 'rgba(255, 255, 255, 0.15)',
+                'stroke-hover': 'rgba(0, 0, 0, 0.4)',
+                'stroke-hover-dark': 'rgba(255, 255, 255, 0.35)',
                 bg: '#ffffff',
                 'bg-dark': '#171717'
+            },
+
+            'code-switcher': {
+                tab: 'rgba(0, 0, 0, 0.1)',
+                'tab-dark': 'rgba(255, 255, 255, 0.15)'
             },
 
             gray: {

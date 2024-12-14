@@ -1,3 +1,22 @@
 {
-    "cSpell.words": ["Astro", "astrojs", "backlinks", "frontmatter", "OpenGraph", "prerendering", "Shiki", "tailwindcss", "tsconfigs", "Vaclav", "Václav", "vancura", "Vančura", "Walsheim", "WCAG", "wght"]
+    "cSpell.words": [
+        "Astro",
+        "astrojs",
+        "backlinks",
+        "frontmatter",
+        "iconify",
+        "OpenGraph",
+        "playform",
+        "prerendering",
+        "Shiki",
+        "tailwindcss",
+        "tsconfigs",
+        "Vaclav",
+        "Václav",
+        "vancura",
+        "Vančura",
+        "Walsheim",
+        "WCAG",
+        "wght"
+    ]
 }

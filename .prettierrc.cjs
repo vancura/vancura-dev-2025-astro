@@ -1,18 +1,27 @@
-let astroPlugin = require.resolve('prettier-plugin-astro');
-let organizeImportsPlugin = require.resolve('prettier-plugin-organize-imports');
-let organizeAttributesPlugin = require.resolve('prettier-plugin-organize-attributes');
-let astroOrganizeImportsPlugin = require.resolve('prettier-plugin-astro-organize-imports');
-let cssOrderPlugin = require.resolve('prettier-plugin-css-order');
-let tailwindPlugin = require.resolve('prettier-plugin-tailwindcss');
-let jsdocPlugin = require.resolve('prettier-plugin-jsdoc');
+const astroPlugin = require.resolve('prettier-plugin-astro');
+const organizeImportsPlugin = require.resolve('prettier-plugin-organize-imports');
+const organizeAttributesPlugin = require.resolve('prettier-plugin-organize-attributes');
+const astroOrganizeImportsPlugin = require.resolve('prettier-plugin-astro-organize-imports');
+const cssOrderPlugin = require.resolve('prettier-plugin-css-order');
+const tailwindPlugin = require.resolve('prettier-plugin-tailwindcss');
+const jsdocPlugin = require.resolve('prettier-plugin-jsdoc');
 
 module.exports = {
-    plugins: [astroPlugin, organizeImportsPlugin, organizeAttributesPlugin, astroOrganizeImportsPlugin, cssOrderPlugin, tailwindPlugin, jsdocPlugin],
+    plugins: [
+        astroPlugin,
+        organizeImportsPlugin,
+        organizeAttributesPlugin,
+        astroOrganizeImportsPlugin,
+        cssOrderPlugin,
+        tailwindPlugin,
+        jsdocPlugin
+    ],
     tabWidth: 4,
     useTabs: false,
-    printWidth: 1000,
+    printWidth: 120,
     proseWrap: 'never',
     singleQuote: true,
+    singleAttributePerLine: false,
     semi: true,
     trailingComma: 'none',
 

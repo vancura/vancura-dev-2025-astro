@@ -1,5 +1,7 @@
 ---
 import { Head } from 'astro-capo';
+import Footer from '../components/Footer.astro';
+import NavBar from '../components/NavBar.astro';
 import BaseHead from '../components/BaseHead.astro';
 import type { SEOMetadata } from '../types';
 
@@ -12,16 +14,19 @@ type Props = SEOMetadata;
 const { title, description, permalink } = Astro.props;
 ---
 
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
     <Head>
         <BaseHead title={title} description={description} permalink={permalink} />
     </Head>
 
-    <body class="flex min-h-screen flex-col bg-background pb-24 dark:bg-background-dark">
-        <main class="mx-8">
+    <body class="flex min-h-screen flex-col bg-background dark:bg-background-dark">
+        <NavBar />
+
+        <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
             <slot />
         </main>
+
+        <Footer />
     </body>
 </html>
