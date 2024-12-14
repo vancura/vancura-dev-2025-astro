@@ -21,3 +21,5 @@
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
 ```
+
+- [ ] Review \_headers file, static files
