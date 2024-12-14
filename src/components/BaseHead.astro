@@ -1,24 +1,22 @@
 ---
 import strings from '../../strings.mjs';
-import type { SEOMetadata } from '../types';
 import { HEAD } from '../config/components';
+import type { ISEOMetadata } from '../types';
 
-export interface Props extends SEOMetadata {
+export interface Props extends ISEOMetadata {
     title: string;
     description: string;
     permalink: string;
-    opengraphImage?: string;
-    opengraphImageAlt?: string;
+    ogImage?: string;
+    ogImageAlt?: string;
 }
 
-const { title, description, permalink, opengraphImage, opengraphImageAlt } = Astro.props;
+const { title, description, permalink, ogImage, ogImageAlt } = Astro.props;
 
 const mode = import.meta.env.MODE;
 const siteDomain = Astro.url.origin;
-
-const opengraphImageURL =
-    opengraphImage === '' ? `${siteDomain}/opengraph.png` : `${siteDomain}/opengraph/${opengraphImage}`;
-const opengraphImageAltSafe = opengraphImageAlt === '' ? title : opengraphImageAlt;
+const ogImageURL = ogImage === '' ? `${siteDomain}/opengraph.png` : `${siteDomain}/opengraph/${ogImage}`;
+const ogImageAltSafe = ogImageAlt === '' ? title : ogImageAlt;
 
 let canonical = new URL(permalink).toString();
 canonical = canonical.endsWith('/') ? canonical.slice(0, -1) : canonical;
@@ -66,16 +64,16 @@ canonical = canonical.endsWith('/') ? canonical.slice(0, -1) : canonical;
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:site_name" content={strings.title} />
-<meta property="og:image" content={opengraphImageURL} />
-<meta property="og:image:alt" content={opengraphImageAltSafe} />
+<meta property="og:image" content={ogImageURL} />
+<meta property="og:image:alt" content={ogImageAltSafe} />
 <meta property="og:author" content={HEAD.META.AUTHOR} />
 
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content={permalink} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={opengraphImageURL} />
-<meta property="twitter:image:alt" content={opengraphImageAltSafe} />
+<meta property="twitter:image" content={ogImageURL} />
+<meta property="twitter:image:alt" content={ogImageAltSafe} />
 
 <meta property="article:author" content={HEAD.META.AUTHOR} />
 
@@ -95,7 +93,16 @@ canonical = canonical.endsWith('/') ? canonical.slice(0, -1) : canonical;
         url: siteDomain,
         author: {
             '@type': 'Person',
-            name: HEAD.META.AUTHOR
+            name: HEAD.META.AUTHOR,
+            url: `${siteDomain}/about`
+        },
+        publisher: {
+            '@type': 'Organization',
+            name: strings.title,
+            logo: {
+                '@type': 'ImageObject',
+                url: ogImageURL
+            }
         }
     })}
 />
