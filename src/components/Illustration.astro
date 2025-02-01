@@ -1,0 +1,71 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+    description: string;
+    position?: 'left' | 'right' | 'content';
+    image: typeof Image;
+    transparent?: boolean;
+    noCaption?: boolean;
+}
+
+const { description, position = 'content', image, transparent = false, noCaption = false } = Astro.props;
+
+// Calculate width and alignment classes based on position.
+const containerClasses = {
+    left: 'mb-4 lg:float-left lg:w-1/2 lg:mr-8 lg:mb-10 select-none',
+    right: 'mb-4 lg:float-right lg:w-1/2 lg:ml-8 lg:mb-10 select-none',
+    center: 'mx-auto lg:w-1/3 mb-4 select-none',
+    content: 'w-full mb-4 select-none',
+    default: 'w-full mb-4 select-none'
+};
+
+// Calculate width and alignment classes based on position.
+const imageClasses = {
+    left: 'aspect-square w-full rounded-md border border-code-stroke bg-code-bg dark:border-code-stroke-dark dark:bg-code-bg-dark',
+    right: 'aspect-square w-full rounded-md border border-code-stroke bg-code-bg dark:border-code-stroke-dark dark:bg-code-bg-dark',
+    center: 'aspect-square w-full rounded-md border border-code-stroke bg-code-bg dark:border-code-stroke-dark dark:bg-code-bg-dark',
+    content: 'w-full rounded-md border border-code-stroke bg-code-bg dark:border-code-stroke-dark dark:bg-code-bg-dark',
+    default: 'w-full rounded-md border border-code-stroke bg-code-bg dark:border-code-stroke-dark dark:bg-code-bg-dark'
+};
+
+const containerClass = containerClasses[position as keyof typeof containerClasses] || containerClasses.default;
+let imageClass = imageClasses[position as keyof typeof imageClasses] || imageClasses.default;
+
+if (transparent) {
+    imageClass += ' mix-blend-multiply border-none';
+}
+---
+
+{
+    image ? (
+        <figure class={containerClass}>
+            <Image
+                src={image}
+                alt={description}
+                class={imageClass}
+                formats={['avif', 'webp']}
+                width={image.width}
+                height={image.height}
+            />
+
+            {!noCaption && (
+                <figcaption class="text-text-muted dark:text-text-muted-dark mb-2 text-center text-sm text-balance">
+                    {description}
+                </figcaption>
+            )}
+        </figure>
+    ) : (
+        <p class="bg-debug text-background rounded-md p-6 text-center font-medium text-balance">
+            Error: Image not found for illustration "{description}"
+        </p>
+    )
+}
+
+<style>
+    figure:after {
+        display: table;
+        clear: both;
+        content: '';
+    }
+</style>

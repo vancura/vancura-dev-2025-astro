@@ -1,0 +1,73 @@
+<script>
+    import { createLogger, type ILogger } from '../utils/logger';
+    import { smoothScrollTo } from '../utils/scroll';
+
+    const logger: ILogger = createLogger({ prefix: 'SmoothScroll' });
+
+    /** Manages smooth scrolling for anchor links on the page. */
+    class SmoothScrollManager {
+        constructor() {
+            this.cleanup = this.cleanup.bind(this);
+            this.handleAnchorClick = this.handleAnchorClick.bind(this);
+
+            document.addEventListener('click', this.handleAnchorClick);
+        }
+
+        /**
+         * Handles click events on anchor elements.
+         *
+         * Intercepts clicks on anchor elements, checks if the href is a local link with a hash fragment, and smoothly
+         * scrolls to the target element on the same page without reloading the page. It also updates the browser
+         * history with the new hash.
+         *
+         * @param {MouseEvent} e - The mouse event triggered by the click.
+         */
+        private handleAnchorClick(e: MouseEvent): void {
+            const target = e.target as Element;
+            const link = target.closest('a');
+
+            if (link?.href) {
+                try {
+                    const url = new URL(link.href);
+                    const isLocalLink = url.origin === window.location.origin;
+                    const hasHash = url.hash.length > 0;
+                    const isSamePage = url.pathname === window.location.pathname;
+
+                    if (isLocalLink && hasHash) {
+                        e.preventDefault();
+
+                        const targetId = url.hash.substring(1);
+
+                        if (isSamePage) {
+                            const targetElement = document.getElementById(targetId);
+                            if (targetElement) {
+                                logger.info(`Scrolling to target: ${targetId}`);
+
+                                smoothScrollTo({ targetId });
+
+                                history.pushState(null, '', url.hash);
+                            } else {
+                                logger.warn(`Target element not found: ${targetId}`);
+                            }
+                        } else {
+                            logger.info(`Navigating to ${url.pathname} with hash: ${targetId}`);
+
+                            window.location.href = link.href;
+                        }
+                    }
+                } catch (error) {
+                    logger.error('Failed to handle anchor click:', error);
+                }
+            }
+        }
+
+        /** Cleanup method to remove event listeners */
+        public cleanup(): void {
+            document.removeEventListener('click', this.handleAnchorClick);
+        }
+    }
+
+    const manager = new SmoothScrollManager();
+
+    document.addEventListener('astro:before-preparation', () => manager.cleanup());
+</script>

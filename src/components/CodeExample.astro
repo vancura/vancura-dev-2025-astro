@@ -1,0 +1,29 @@
+---
+/* eslint-disable astro/no-unused-css-selector */
+
+interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<section class="code-example">
+    <button type="button" data-tab class="code-switcher-tab rounded-t px-2 py-1 text-[12px] lg:px-4 lg:text-[14px]"
+        >{title}</button
+    >
+
+    <div data-content class="code-switcher-content hidden">
+        <slot />
+    </div>
+</section>
+
+<style>
+    .code-switcher-tab.is-active {
+        @apply bg-code-switcher-tab dark:bg-code-switcher-tab-dark;
+    }
+
+    .code-switcher-content.is-active {
+        @apply block;
+    }
+</style>
