@@ -1,14 +1,11 @@
 {
+    "eslint.validate": ["javascript", "javascriptreact", "astro", "typescript"],
     "cSpell.words": [
         "Astro",
         "astrojs",
         "backlinks",
         "Degular",
         "frontmatter",
-        "Grotesk",
-        "iconify",
-        "IMDX",
-        "ISEO",
         "noindex",
         "nosniff",
         "OpenGraph",
@@ -22,8 +19,8 @@
         "vancura",
         "Vančura",
         "Vercel",
-        "Walsheim",
         "WCAG",
         "wght"
-    ]
+    ],
+    "cSpell.enabled": false
 }
