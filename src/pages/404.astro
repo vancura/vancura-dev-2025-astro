@@ -1,19 +1,16 @@
 ---
+import strings from '../../strings.mjs';
+import Content from '../content/pages/404.mdx';
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="404 - Page Not Found" description="The page you're looking for doesn't exist" permalink={Astro.url.href}>
-    <div class="py-16 text-center">
-        <h1 class="mb-4 font-heading text-8xl">404</h1>
-        <p class="mb-8 text-xl text-text-muted dark:text-text-muted-dark">
-            I apologize for the inconvenience.<br />
-            Please navigate to the home or use the menu to find the information you're seeking.
-        </p>
-        <a
-            href="/"
-            class="inline-block rounded-lg bg-primary px-6 py-3 text-white transition-colors hover:bg-primary-hover"
-        >
-            Go Home
-        </a>
-    </div>
+<Layout
+    title={`404 • ${strings.title}`}
+    description="Page not found."
+    ogImage="https://whitepaper.actor/opengraph.png"
+    permalink={Astro.url.toString()}
+>
+    <header class="mdx-content mx-auto max-w-(--breakpoint-lg)" role="banner">
+        <Content />
+    </header>
 </Layout>

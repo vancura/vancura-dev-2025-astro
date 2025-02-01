@@ -60,6 +60,21 @@ class Logger implements ILogger {
         this.minLevel = options.minLevel ?? 'info';
     }
 
+    /** @inheritdoc */
+    public info(message: string): void {
+        this.log('info', message);
+    }
+
+    /** @inheritdoc */
+    public warn(message: string): void {
+        this.log('warning', message);
+    }
+
+    /** @inheritdoc */
+    public error(message: string, error?: unknown): void {
+        this.log('error', message, error);
+    }
+
     /**
      * Determine if a log message should be displayed based on the minimum log level.
      *
@@ -88,31 +103,19 @@ class Logger implements ILogger {
 
             switch (level) {
                 case 'info':
+                    // eslint-disable-next-line no-undef
                     console.info(formattedMessage);
                     break;
                 case 'warning':
+                    // eslint-disable-next-line no-undef
                     console.warn(formattedMessage);
                     break;
                 case 'error':
+                    // eslint-disable-next-line no-undef
                     console.error(formattedMessage, error || '');
                     break;
             }
         }
-    }
-
-    /** @inheritdoc */
-    public info(message: string): void {
-        this.log('info', message);
-    }
-
-    /** @inheritdoc */
-    public warn(message: string): void {
-        this.log('warning', message);
-    }
-
-    /** @inheritdoc */
-    public error(message: string, error?: unknown): void {
-        this.log('error', message, error);
     }
 }
 

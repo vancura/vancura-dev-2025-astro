@@ -9,42 +9,34 @@ const navItems = [
 
 <header
     aria-label="Main Menu"
-    class="sticky top-0 z-50 w-full border-b border-ui-border bg-background/80 backdrop-blur-lg dark:border-ui-border-dark dark:bg-background-dark/80"
+    class="bg-debug pointer-events-none fixed z-10 flex h-min w-full flex-col flex-nowrap content-center items-center justify-center gap-x-0 gap-y-0 align-middle backdrop-blur-lg select-none"
 >
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 items-center justify-between">
-            <nav aria-label="Primary" class="flex items-center">
-                <a
-                    href="/"
-                    class="font-heading text-text hover:text-primary dark:text-text-dark dark:hover:text-primary-dark"
-                >
-                    Václav&nbsp;Vančura
-                </a>
-            </nav>
+    <!-- Menu Stack -->
+    <div
+        class="relative flex h-min max-w-screen-lg flex-row content-center items-center justify-center gap-x-7 gap-y-7 px-7 py-0"
+    >
+        <nav aria-label="Primary" class="">
+            <a href="/" class="">Václav&nbsp;Vančura</a>
+        </nav>
 
-            <nav aria-label="Secondary" class="hidden items-center space-x-8 md:flex">
-                {
-                    navItems.map((item) => (
-                        <a
-                            href={item.href}
-                            class="text-text-muted transition-colors duration-200 hover:text-primary dark:text-text-muted-dark dark:hover:text-primary-dark"
-                        >
-                            {item.name}
-                        </a>
-                    ))
-                }
-            </nav>
+        <nav aria-label="Secondary" class="">
+            {
+                navItems.map((item) => (
+                    <a href={item.href} class="">
+                        {item.name}
+                    </a>
+                ))
+            }
+        </nav>
 
-            <button
-                type="button"
-                class="rounded-md p-2 text-text-muted hover:bg-background-dark/10 md:hidden dark:text-text-muted-dark"
-                aria-label="Toggle menu"
-            >
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"
-                    ></path>
-                </svg>
-            </button>
-        </div>
+        <button type="button" class="/" aria-label="Toggle menu">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"
+                ></path>
+            </svg>
+        </button>
     </div>
+
+    <!-- Separator Stack -->
+    <div class="px-7 py-0"><div class="bg-debug"></div></div>
 </header>

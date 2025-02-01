@@ -1,20 +1,20 @@
-import type { IHeadConfig, IMDXConfig } from '../types';
-
-export const COMPONENT_CONFIG: {
-    HEAD: IHeadConfig;
-    MDX: IMDXConfig;
-} = {
+/** Component-specific configuration constants. */
+export const COMPONENT_CONFIG = {
+    // Base Head constants.
     HEAD: {
         META: {
             LANGUAGE: 'English',
             AUTHOR: 'Václav Vančura',
-            REFERRER: 'origin'
+            REFERRER: 'origin',
+            URL: 'https://vancura.dev'
         }
     },
 
+    // MDX Wrapper constants.
     MDX: {
         FALLBACK_MESSAGE: 'Failed to load content. Please try refreshing the page.'
     }
-};
+} as const;
 
+// Export specific configs for direct imports.
 export const { HEAD, MDX } = COMPONENT_CONFIG;

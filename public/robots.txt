@@ -9,7 +9,7 @@ Disallow: /500
 # Prevent crawling of potential sensitive paths
 # Disallow: /private/
 
-Sitemap: https://vancura.design/sitemap-index.xml
+Sitemap: https://vancura.dev/sitemap-index.xml
 
 # Crawl-delay for heavy crawlers (optional)
 # Crawl-delay: 10

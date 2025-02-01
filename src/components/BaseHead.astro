@@ -1,39 +1,34 @@
 ---
-import strings from '../../strings.mjs';
 import { HEAD } from '../config/components';
-import type { ISEOMetadata } from '../types';
+import type { ISEOMetadata } from '../types/seo';
 
 export interface Props extends ISEOMetadata {
     title: string;
     description: string;
     permalink: string;
     ogImage?: string;
-    ogImageAlt?: string;
 }
 
-const { title, description, permalink, ogImage, ogImageAlt } = Astro.props;
-
-const mode = import.meta.env.MODE;
-const siteDomain = Astro.url.origin;
-const ogImageURL = ogImage === '' ? `${siteDomain}/opengraph.png` : `${siteDomain}/opengraph/${ogImage}`;
-const ogImageAltSafe = ogImageAlt === '' ? title : ogImageAlt;
+const { title, description, ogImage, permalink } = Astro.props;
 
 let canonical = new URL(permalink).toString();
 canonical = canonical.endsWith('/') ? canonical.slice(0, -1) : canonical;
+const siteDomain = Astro.url.origin;
 ---
 
 <meta
     http-equiv="Content-Security-Policy"
     content="
     default-src 'self';
-    script-src 'self' https://plausible.io;
+    script-src 'self' https://plausible.io https://unpkg.com 'unsafe-inline' 'unsafe-eval' blob:;
     style-src 'self' 'unsafe-inline';
-    img-src 'self';
-    font-src 'self';
-    connect-src 'self' https://plausible.io;
+    img-src 'self' data: blob:;
+    font-src 'self' data:;
+    connect-src 'self' https://plausible.io https://unpkg.com;
     frame-ancestors 'none';
     base-uri 'self';
     form-action 'self';
+    upgrade-insecure-requests;
 "
 />
 <meta http-equiv="X-Content-Type-Options" content="nosniff" />
@@ -47,7 +42,7 @@ canonical = canonical.endsWith('/') ? canonical.slice(0, -1) : canonical;
 
 <link rel="canonical" href={canonical} />
 <link rel="sitemap" href="/sitemap-index.xml" />
-<link rel="alternate" type="application/rss+xml" title="Václav Vančura Design" href="/design.xml" />
+<link rel="alternate" type="application/rss+xml" title="Václav Vančura Development" href="/development.xml" />
 
 <title>{title}</title>
 
@@ -63,33 +58,42 @@ canonical = canonical.endsWith('/') ? canonical.slice(0, -1) : canonical;
 <meta property="og:url" content={permalink} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:site_name" content={strings.title} />
-<meta property="og:image" content={ogImageURL} />
-<meta property="og:image:alt" content={ogImageAltSafe} />
+<meta property="og:site_name" content={title} />
 <meta property="og:author" content={HEAD.META.AUTHOR} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:alt" content={title} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="627" />
+<meta property="og:image:type" content="image/png" />
 
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={permalink} />
-<meta property="twitter:title" content={title} />
-<meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={ogImageURL} />
-<meta property="twitter:image:alt" content={ogImageAltSafe} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={permalink} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={title} />
+<meta name="twitter:image:width" content="1200" />
+<meta name="twitter:image:height" content="627" />
+<meta name="twitter:image:type" content="image/png" />
+<meta name="twitter:creator" content={HEAD.META.AUTHOR} />
+<meta name="twitter:site" content="@apify" />
+<meta name="twitter:domain" content="whitepaper.actor" />
 
 <meta property="article:author" content={HEAD.META.AUTHOR} />
 
-<link rel="manifest" href="/manifest.json" />
-
+<link href="/favicon.png" rel="icon" media="(prefers-color-scheme: light)" />
+<link href="/favicon-dark.png" rel="icon" media="(prefers-color-scheme: dark)" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content={strings.title} />
+<meta name="apple-mobile-web-app-title" content={title} />
 
 <script
     type="application/ld+json"
     set:html={JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        name: strings.title,
-        description: description,
+        name: title,
+        description,
         url: siteDomain,
         author: {
             '@type': 'Person',
@@ -98,17 +102,22 @@ canonical = canonical.endsWith('/') ? canonical.slice(0, -1) : canonical;
         },
         publisher: {
             '@type': 'Organization',
-            name: strings.title,
+            name: title,
             logo: {
                 '@type': 'ImageObject',
-                url: ogImageURL
+                url: ogImage
             }
         }
     })}
 />
 
 {
-    mode === 'production' && (
-        <script defer data-domain="vancura.design" data-category="analytics" src="https://plausible.io/js/script.js" />
+    import.meta.env.MODE === 'production' && (
+        <script
+            defer
+            data-domain="vancura.dev"
+            data-category="analytics"
+            src="https://plausible.io/js/script.hash.js"
+        />
     )
 }

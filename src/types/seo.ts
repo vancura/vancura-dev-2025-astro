@@ -12,9 +12,6 @@ export interface ISEOMetadata {
     /** URL to the OpenGraph image. */
     ogImage?: string;
 
-    /** Alt text for the OpenGraph image, which provides context for screen readers or when the image fails to load. */
-    ogImageAlt?: string;
-
     /** ISO 8601 date string for article publish date. */
     articlePublishedTime?: string;
 
