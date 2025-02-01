@@ -2,7 +2,6 @@ const astroPlugin = require.resolve('prettier-plugin-astro');
 const organizeImportsPlugin = require.resolve('prettier-plugin-organize-imports');
 const organizeAttributesPlugin = require.resolve('prettier-plugin-organize-attributes');
 const astroOrganizeImportsPlugin = require.resolve('prettier-plugin-astro-organize-imports');
-const cssOrderPlugin = require.resolve('prettier-plugin-css-order');
 const tailwindPlugin = require.resolve('prettier-plugin-tailwindcss');
 const jsdocPlugin = require.resolve('prettier-plugin-jsdoc');
 
@@ -12,7 +11,6 @@ module.exports = {
         organizeImportsPlugin,
         organizeAttributesPlugin,
         astroOrganizeImportsPlugin,
-        cssOrderPlugin,
         tailwindPlugin,
         jsdocPlugin
     ],

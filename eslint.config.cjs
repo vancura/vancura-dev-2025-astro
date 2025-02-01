@@ -21,6 +21,7 @@ module.exports = [
             '.astro/**',
             '.git/**',
             '.vscode/**',
+            '.yarn/**',
             '*.min.*',
             '**/*.json',
             '**/*.jsonc',
@@ -36,8 +37,6 @@ module.exports = [
             'jsconfig.json',
             '.prettierrc.cjs',
             'eslint.config.cjs',
-            'postcss.config.cjs',
-            'tailwind.config.cjs',
             'astro.config.mjs',
             'src/env.d.ts'
         ]
@@ -192,7 +191,6 @@ module.exports = [
             'jsdoc/require-returns': 'warn',
 
             // Tailwind
-            'tailwindcss/classnames-order': 'error',
             'tailwindcss/no-custom-classname': 'off'
         }
     },
@@ -219,7 +217,7 @@ module.exports = [
 
     // TypeScript and JavaScript Files Configuration
     {
-        files: ['**/*.{js,ts,jsx,tsx,mjs,cjs}'],
+        files: ['**/*.{js,ts,mjs,cjs}'],
         languageOptions: {
             parser: tsParser,
             parserOptions: {
