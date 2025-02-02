@@ -1,3 +1,6 @@
+import CodeExample from '../../components/CodeExample.astro';
+import CodeSwitcher from '../../components/CodeSwitcher.astro';
+
 # The Web Actor Programming Model Whitepaper
 
 **This whitepaper describes a new concept for building serverless microapps called **_Actors_**, which are easy to develop, share, integrate, and build upon. Actors are a reincarnation of the UNIX philosophy for programs running in the cloud.**
@@ -13,6 +16,46 @@ This whitepaper introduces **_Actors_**, a new kind of serverless programs for g
 ### Background
 
 The Actors were first introduced by [Apify](https://apify.com/) in late 2017, as a way to easily build, package, and ship web scraping and web automation tools to customers. Over the years, Apify has continued to develop the concept and applied it successfully to thousands of real-world use cases in many business areas, well beyond the domain of web scraping.
+
+<CodeSwitcher>
+
+    <CodeExample title="Node.js">
+
+        The most complete implementation of Actor system is provided by the Apify SDK for Node.js, via the [apify](https://www.npmjs.com/package/apify) NPM package. The package contains everything that you need to start building Actors locally. You can install it to your Node.js project by running:
+
+        ```bash
+        $ npm install apify
+        ```
+
+    </CodeExample>
+
+    <CodeExample title="Python">
+
+        To build Actors in Python, simply install the Apify SDK for Python, via the [apify](https://pypi.org/project/apify/) PyPi package into your project:
+
+        ```bash
+        $ pip3 install apify
+        ```
+
+    </CodeExample>
+
+    <CodeExample title="CLI">
+
+        For local development of Actors and management of the Apify platform, it is handy to install Apify CLI. You can install it:
+
+        ```bash
+        $ brew install apify-cli
+        ```
+
+        or via the [apify-cli](https://www.npmjs.com/package/apify-cli) Node.js package:
+
+        ```bash
+        $ npm install -g apify-cli
+        ```
+
+    </CodeExample>
+
+</CodeSwitcher>
 
 Building on this experience, we're releasing this whitepaper to introduce the philosophy of Actors to the public and receive your feedback on it. We aim to establish the Actor programming model as an open standard, which will help community to more effectively build and ship reusable software automation tools, as well as encourage new implementations of the model in other programming languages.
 
