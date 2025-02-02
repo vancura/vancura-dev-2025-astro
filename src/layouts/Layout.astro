@@ -3,8 +3,6 @@ import { Head } from 'astro-capo';
 
 import BaseHead from '../components/BaseHead.astro';
 import CodeCopy from '../components/CodeCopy.astro';
-import Footer from '../components/Footer.astro';
-import NavBar from '../components/NavBar.astro';
 import SmoothScroll from '../components/SmoothScroll.astro';
 import '../styles/global.css';
 
@@ -23,6 +21,5 @@ const { title, description, ogImage, permalink } = Astro.props;
 
         <CodeCopy />
         <SmoothScroll />
-        <Footer />
     </body>
 </html>
