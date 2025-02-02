@@ -1,0 +1,456 @@
+---
+import { currentExperimentStore } from '../stores/experiment-store';
+
+interface Props {
+    id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<div class="experiment-container">
+    <canvas id={`gpuCanvas-${id}`} width="320" height="200"></canvas>
+    <button id={`startButton-${id}`} class="start-button">[START]</button>
+</div>
+
+<style>
+    .experiment-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    canvas {
+        zoom: 2;
+        image-rendering: pixelated;
+        background: black;
+        width: 320px;
+        height: 200px;
+    }
+
+    .start-button {
+        margin-top: 16px;
+        padding: 8px 16px;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+</style>
+
+<script is:inline>
+    // Make store globally available
+    if (!window.experimentStore) {
+        window.experimentStore = {
+            current: null,
+            set(value) {
+                console.log('Setting experiment:', value?.id || 'null');
+                this.current = value;
+            },
+            get() {
+                return this.current;
+            }
+        };
+    }
+</script>
+
+<script define:vars={{ id }}>
+    console.log(`Initializing WebGPU experiment: ${id}`);
+
+    async function initVGAEmulator(canvasId) {
+        console.log(`Initializing VGA emulator for: ${canvasId}`);
+
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.error(`Canvas not found: ${canvasId}`);
+            return null;
+        }
+
+        // Constants
+        const SCREEN_WIDTH = 320;
+        const SCREEN_HEIGHT = 200;
+        const PALETTE_SIZE = 256;
+
+        canvas.width = SCREEN_WIDTH;
+        canvas.height = SCREEN_HEIGHT;
+
+        const context = canvas.getContext('webgpu');
+        if (!context) {
+            console.error('WebGPU context not available');
+            return null;
+        }
+
+        // Get adapter and device with required limits
+        const adapter = await navigator.gpu.requestAdapter();
+        const device = await adapter.requestDevice({
+            requiredFeatures: [],
+            requiredLimits: {
+                maxBufferSize: 256 * 1024 * 1024,
+                maxStorageBufferBindingSize: 256 * 1024 * 1024
+            }
+        });
+        const format = navigator.gpu.getPreferredCanvasFormat();
+
+        context.configure({
+            device,
+            format,
+            alphaMode: 'premultiplied'
+        });
+
+        /** Create our index framebuffer texture */
+        const indexFramebuffer = device.createTexture({
+            size: [SCREEN_WIDTH, SCREEN_HEIGHT],
+            format: 'r8uint',
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST
+        });
+
+        /** Initialize palette with default colors */
+        const paletteData = new Float32Array(PALETTE_SIZE * 4);
+
+        function initializePalette() {
+            // Color 0 - Background (Black)
+            paletteData[0] = 0.0;
+            paletteData[1] = 0.0;
+            paletteData[2] = 0.0;
+            paletteData[3] = 1.0;
+
+            // Colors 1-16 - Our rotating gradient colors
+            for (let i = 0; i < 16; i++) {
+                const hue = i / 16;
+                const h = hue * 6;
+                const c = 1;
+                const x = c * (1 - Math.abs((h % 2) - 1));
+
+                let r, g, b;
+                if (h <= 1) {
+                    r = c;
+                    g = x;
+                    b = 0;
+                } else if (h <= 2) {
+                    r = x;
+                    g = c;
+                    b = 0;
+                } else if (h <= 3) {
+                    r = 0;
+                    g = c;
+                    b = x;
+                } else if (h <= 4) {
+                    r = 0;
+                    g = x;
+                    b = c;
+                } else if (h <= 5) {
+                    r = x;
+                    g = 0;
+                    b = c;
+                } else {
+                    r = c;
+                    g = 0;
+                    b = x;
+                }
+
+                const idx = (i + 1) * 4;
+                paletteData[idx] = r;
+                paletteData[idx + 1] = g;
+                paletteData[idx + 2] = b;
+                paletteData[idx + 3] = 1.0;
+            }
+
+            // Color 17 - Triangle color (Pink)
+            paletteData[17 * 4] = 1.0;
+            paletteData[17 * 4 + 1] = 0.4;
+            paletteData[17 * 4 + 2] = 0.7;
+            paletteData[17 * 4 + 3] = 1.0;
+        }
+
+        initializePalette();
+
+        /** Create and initialize the palette buffer */
+        const paletteBuffer = device.createBuffer({
+            size: paletteData.byteLength,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+            mappedAtCreation: true
+        });
+        new Float32Array(paletteBuffer.getMappedRange()).set(paletteData);
+        paletteBuffer.unmap();
+
+        /** Initialize framebuffer with our scene */
+        const frameBuffer = new Uint8Array(SCREEN_WIDTH * SCREEN_HEIGHT);
+
+        function initializeScene() {
+            frameBuffer.fill(0);
+
+            // Draw a circle with gradient bands
+            const centerX = SCREEN_WIDTH / 2;
+            const centerY = SCREEN_HEIGHT / 2;
+            const radius = 90;
+
+            for (let y = 0; y < SCREEN_HEIGHT; y++) {
+                for (let x = 0; x < SCREEN_WIDTH; x++) {
+                    const dx = x - centerX;
+                    const dy = y - centerY;
+                    if (dx * dx + dy * dy <= radius * radius) {
+                        const colorIndex = Math.floor(((y - (centerY - radius)) / (radius * 2)) * 16) + 1;
+                        frameBuffer[y * SCREEN_WIDTH + x] = colorIndex;
+                    }
+                }
+            }
+
+            function drawTriangle(x1, y1, x2, y2, x3, y3, colorIndex) {
+                const minX = Math.min(x1, x2, x3);
+                const maxX = Math.max(x1, x2, x3);
+                const minY = Math.min(y1, y2, y3);
+                const maxY = Math.max(y1, y2, y3);
+
+                for (let y = minY; y <= maxY; y++) {
+                    for (let x = minX; x <= maxX; x++) {
+                        const b1 =
+                            ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) /
+                            ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+                        const b2 =
+                            ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) /
+                            ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+                        const b3 = 1 - b1 - b2;
+
+                        if (b1 >= 0 && b2 >= 0 && b3 >= 0) {
+                            frameBuffer[y * SCREEN_WIDTH + x] = colorIndex;
+                        }
+                    }
+                }
+            }
+
+            // Draw triangle in center top of circle
+            drawTriangle(
+                centerX,
+                centerY - radius - 20, // Top
+                centerX - 20,
+                centerY - radius + 20, // Bottom left
+                centerX + 20,
+                centerY - radius + 20, // Bottom right
+                17 // Color index
+            );
+
+            device.queue.writeTexture({ texture: indexFramebuffer }, frameBuffer, { bytesPerRow: SCREEN_WIDTH }, [
+                SCREEN_WIDTH,
+                SCREEN_HEIGHT
+            ]);
+        }
+
+        initializeScene();
+
+        /** Create shader for displaying the indexed framebuffer */
+        const shaderCode = `
+            struct Palette {
+                colors: array<vec4<f32>, ${PALETTE_SIZE}>,
+            }
+            @group(0) @binding(0) var<uniform> palette: Palette;
+            @group(0) @binding(1) var indexTex: texture_2d<u32>;
+
+            struct VertexOutput {
+                @builtin(position) position: vec4<f32>,
+                @location(0) texCoord: vec2<f32>,
+            }
+
+            @vertex
+            fn vs_main(@builtin(vertex_index) vertexIndex: u32) -> VertexOutput {
+                var pos = array<vec2<f32>, 6>(
+                    vec2<f32>(-1.0,  1.0),
+                    vec2<f32>(-1.0, -1.0),
+                    vec2<f32>( 1.0,  1.0),
+                    vec2<f32>( 1.0,  1.0),
+                    vec2<f32>(-1.0, -1.0),
+                    vec2<f32>( 1.0, -1.0)
+                );
+
+                var texCoords = array<vec2<f32>, 6>(
+                    vec2<f32>(0.0, 0.0),
+                    vec2<f32>(0.0, 1.0),
+                    vec2<f32>(1.0, 0.0),
+                    vec2<f32>(1.0, 0.0),
+                    vec2<f32>(0.0, 1.0),
+                    vec2<f32>(1.0, 1.0)
+                );
+
+                var output: VertexOutput;
+                output.position = vec4<f32>(pos[vertexIndex], 0.0, 1.0);
+                output.texCoord = texCoords[vertexIndex];
+                return output;
+            }
+
+            @fragment
+            fn fs_main(@location(0) texCoord: vec2<f32>) -> @location(0) vec4<f32> {
+                let coords = vec2<i32>(
+                    i32(texCoord.x * f32(${SCREEN_WIDTH})),
+                    i32(texCoord.y * f32(${SCREEN_HEIGHT}))
+                );
+
+                let colorIndex = textureLoad(indexTex, coords, 0).r;
+                return palette.colors[colorIndex];
+            }
+        `;
+
+        const shaderModule = device.createShaderModule({
+            code: shaderCode
+        });
+
+        const pipeline = device.createRenderPipeline({
+            layout: 'auto',
+            vertex: {
+                module: shaderModule,
+                entryPoint: 'vs_main'
+            },
+            fragment: {
+                module: shaderModule,
+                entryPoint: 'fs_main',
+                targets: [{ format }]
+            },
+            primitive: {
+                topology: 'triangle-list'
+            }
+        });
+
+        const bindGroup = device.createBindGroup({
+            layout: pipeline.getBindGroupLayout(0),
+            entries: [
+                {
+                    binding: 0,
+                    resource: { buffer: paletteBuffer }
+                },
+                {
+                    binding: 1,
+                    resource: indexFramebuffer.createView()
+                }
+            ]
+        });
+
+        function render() {
+            const commandEncoder = device.createCommandEncoder();
+            const textureView = context.getCurrentTexture().createView();
+
+            const renderPass = commandEncoder.beginRenderPass({
+                colorAttachments: [
+                    {
+                        view: textureView,
+                        loadOp: 'clear',
+                        storeOp: 'store',
+                        clearValue: { r: 0, g: 0, b: 0, a: 1 }
+                    }
+                ]
+            });
+
+            renderPass.setPipeline(pipeline);
+            renderPass.setBindGroup(0, bindGroup);
+            renderPass.draw(6, 1, 0, 0);
+            renderPass.end();
+
+            device.queue.submit([commandEncoder.finish()]);
+        }
+
+        let animationFrame = null;
+        let startTime = performance.now();
+
+        function rotatePalette() {
+            const elapsed = (performance.now() - startTime) / 1000;
+            const offset = elapsed * 0.5;
+
+            const tempPalette = new Float32Array(paletteData);
+            for (let i = 0; i < 16; i++) {
+                const hue = (i / 16 + offset) % 1.0;
+                const h = hue * 6;
+                const c = 1;
+                const x = c * (1 - Math.abs((h % 2) - 1));
+
+                let r, g, b;
+                if (h <= 1) {
+                    r = c;
+                    g = x;
+                    b = 0;
+                } else if (h <= 2) {
+                    r = x;
+                    g = c;
+                    b = 0;
+                } else if (h <= 3) {
+                    r = 0;
+                    g = c;
+                    b = x;
+                } else if (h <= 4) {
+                    r = 0;
+                    g = x;
+                    b = c;
+                } else if (h <= 5) {
+                    r = x;
+                    g = 0;
+                    b = c;
+                } else {
+                    r = c;
+                    g = 0;
+                    b = x;
+                }
+
+                const idx = (i + 1) * 4;
+                tempPalette[idx] = r;
+                tempPalette[idx + 1] = g;
+                tempPalette[idx + 2] = b;
+                tempPalette[idx + 3] = 1.0;
+            }
+
+            device.queue.writeBuffer(paletteBuffer, 0, tempPalette);
+            paletteData.set(tempPalette);
+
+            render();
+            animationFrame = requestAnimationFrame(rotatePalette);
+        }
+
+        render();
+
+        // Return the emulator interface
+        return {
+            id: canvasId,
+            start() {
+                console.log(`Starting emulator: ${canvasId}`);
+                startTime = performance.now();
+                rotatePalette();
+            },
+            stop() {
+                console.log(`Stopping emulator: ${canvasId}`);
+                if (animationFrame) {
+                    cancelAnimationFrame(animationFrame);
+                    animationFrame = null;
+                }
+            }
+        };
+    }
+
+    async function initialize() {
+        console.log(`Setting up experiment: ${id}`);
+
+        const canvasId = `gpuCanvas-${id}`;
+        const buttonId = `startButton-${id}`;
+
+        const button = document.getElementById(buttonId);
+        if (!button) {
+            console.error(`Button not found: ${buttonId}`);
+            return;
+        }
+
+        button.addEventListener('click', async () => {
+            console.log(`Button clicked for: ${id}`);
+
+            // Stop current experiment if running
+            const current = window.experimentStore.get();
+            if (current) {
+                console.log(`Stopping current experiment: ${current.id}`);
+                current.stop();
+                window.experimentStore.set(null); // Clear the store before starting new experiment
+            }
+
+            // Start new experiment
+            const emulator = await initVGAEmulator(canvasId);
+            if (emulator) {
+                console.log(`Starting new experiment: ${id}`);
+                window.experimentStore.set(emulator);
+                emulator.start();
+            }
+        });
+    }
+
+    // Initialize immediately
+    initialize();
+</script>
